@@ -1,14 +1,18 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
-import {
-  getContactsController,
-  getContactByIdController,
-} from './controllers/contacts.js';
+import { env } from './utils/env.js';
+import contactsRouter from './routers/contacts.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+
 export const setupServer = () => {
   const app = express();
 
-  // CORS ayarı: Farklı domainlerden (örneğin frontend'den) gelen isteklere izin verir
+  // JSON verilerini okuyabilmek için body-parser
+  app.use(express.json());
+
+  // CORS ayarı: Farklı domainlerden gelen isteklere izin verir
   app.use(cors());
 
   // Pino Logger: Gelen istekleri terminale detaylı şekilde loglar
@@ -19,19 +23,18 @@ export const setupServer = () => {
       },
     }),
   );
-  app.get('/contacts', getContactsController);
-  // JSON verilerini okuyabilmek için
-  app.use(express.json());
-  app.get('/contacts/:contactId', getContactByIdController);
-  // Bulunamayan rotalar (404) için middleware
-  app.use((req, res, next) => {
-    res.status(404).json({
-      message: 'Not found',
-    });
-  });
 
-  // PORT değişkenini çevresel değişkenlerden (.env) al, yoksa 3000 kullan
-  const PORT = process.env.PORT || 3000;
+  // Rotaları (Router) projeye dahil etme
+  app.use(contactsRouter);
+
+  // Bulunamayan rotalar (404) için middleware
+  app.use(notFoundHandler);
+
+  // Genel hata yönetimi (Error Handler) middleware'i (en sonda olmalı)
+  app.use(errorHandler);
+
+  // PORT değişkenini çevresel değişkenlerden al, yoksa 3000 kullan
+  const PORT = Number(env('PORT', '3000'));
 
   // Sunucuyu başlat
   app.listen(PORT, () => {
