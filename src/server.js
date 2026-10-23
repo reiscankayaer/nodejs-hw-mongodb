@@ -23,9 +23,8 @@ export const setupServer = () => {
       },
     }),
   );
-
   // Rotaları (Router) projeye dahil etme
-  app.use(contactsRouter);
+  app.use('/contacts', contactsRouter);
 
   // Bulunamayan rotalar (404) için middleware
   app.use(notFoundHandler);
