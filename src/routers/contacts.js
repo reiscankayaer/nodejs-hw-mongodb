@@ -1,4 +1,12 @@
 import { Router } from 'express';
+import { authenticate } from '../middlewares/authenticate.js';
+import { isValidId } from '../middlewares/isValidId.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import {
+  createContactSchema,
+  updateContactSchema,
+} from '../validation/contacts.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   getContactsController,
   getContactByIdController,
@@ -6,32 +14,25 @@ import {
   patchContactController,
   deleteContactController,
 } from '../controllers/contacts.js';
-import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-
-// Middleware ve Şemaları İçe Aktarma
-import { isValidId } from '../middlewares/isValidId.js';
-import { validateBody } from '../middlewares/validateBody.js';
-import {
-  createContactSchema,
-  updateContactSchema,
-} from '../validation/contacts.js';
 
 const router = Router();
+
+router.use(authenticate);
 
 // Listeleme (GET)
 router.get('/', ctrlWrapper(getContactsController));
 
-// Tek Kişi Getirme (GET by ID) - isValidId eklendi
+// Tek Kişi Getirme (GET by ID)
 router.get('/:contactId', isValidId, ctrlWrapper(getContactByIdController));
 
-// Kişi Oluşturma (POST) - validateBody ve createContactSchema eklendi
+// Kişi Oluşturma (POST)
 router.post(
   '/',
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
 
-// Kişi Güncelleme (PATCH) - isValidId, validateBody ve updateContactSchema eklendi
+// Kişi Güncelleme (PATCH)
 router.patch(
   '/:contactId',
   isValidId,
@@ -39,6 +40,7 @@ router.patch(
   ctrlWrapper(patchContactController),
 );
 
-// Kişi Silme (DELETE) - isValidId eklendi
+// Kişi Silme (DELETE)
 router.delete('/:contactId', isValidId, ctrlWrapper(deleteContactController));
+
 export default router;

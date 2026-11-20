@@ -2,15 +2,20 @@ import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
 import { env } from './utils/env.js';
-import contactsRouter from './routers/contacts.js';
+import router from './routers/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import cookieParser from 'cookie-parser';
 
 export const setupServer = () => {
   const app = express();
 
   // JSON verilerini okuyabilmek için body-parser
   app.use(express.json());
+  7;
+  app.use(express.json());
+  app.use(cookieParser());
+  app.use(router);
 
   // CORS ayarı: Farklı domainlerden gelen isteklere izin verir
   app.use(cors());
@@ -24,7 +29,8 @@ export const setupServer = () => {
     }),
   );
   // Rotaları (Router) projeye dahil etme
-  app.use('/contacts', contactsRouter);
+  app.use(router);
+
 
   // Bulunamayan rotalar (404) için middleware
   app.use(notFoundHandler);
