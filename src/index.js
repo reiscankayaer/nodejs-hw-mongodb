@@ -1,12 +1,11 @@
-import 'dotenv/config';
-import { setupServer } from './server.js';
 import { initMongoConnection } from './db/initMongoConnection.js';
+import { setupServer } from './server.js';
+import { createDirIfNotExists } from './utils/createDirIfNotExists.js';
+import { TEMP_UPLOAD_DIR } from './constants/index.js';
 
 const bootstrap = async () => {
-  // Önce veritabanına bağlan
   await initMongoConnection();
-
-  // Bağlantı başarılı olduktan sonra sunucuyu başlat
+  await createDirIfNotExists(TEMP_UPLOAD_DIR);
   setupServer();
 };
 
