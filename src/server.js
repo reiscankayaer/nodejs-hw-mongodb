@@ -6,6 +6,8 @@ import router from './routers/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import cookieParser from 'cookie-parser';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
+
 
 export const setupServer = () => {
   const app = express();
@@ -30,7 +32,8 @@ export const setupServer = () => {
   );
   // Rotaları (Router) projeye dahil etme
   app.use(router);
-
+ // Swagger dokümantasyonunu /api-docs yolunda sunma
+  app.use('/api-docs', swaggerDocs());
 
   // Bulunamayan rotalar (404) için middleware
   app.use(notFoundHandler);
