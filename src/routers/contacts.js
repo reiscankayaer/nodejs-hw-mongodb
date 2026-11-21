@@ -1,12 +1,4 @@
 import { Router } from 'express';
-import { authenticate } from '../middlewares/authenticate.js';
-import { isValidId } from '../middlewares/isValidId.js';
-import { validateBody } from '../middlewares/validateBody.js';
-import {
-  createContactSchema,
-  updateContactSchema,
-} from '../validation/contacts.js';
-import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   getContactsController,
   getContactByIdController,
@@ -14,33 +6,39 @@ import {
   patchContactController,
   deleteContactController,
 } from '../controllers/contacts.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import {
+  createContactSchema,
+  updateContactSchema,
+} from '../validation/contacts.js';
+import { isValidId } from '../middlewares/isValidId.js';
+import { authenticate } from '../middlewares/authenticate.js';
+import { upload } from '../middlewares/multer.js';
 
 const router = Router();
 
 router.use(authenticate);
 
-// Listeleme (GET)
 router.get('/', ctrlWrapper(getContactsController));
 
-// Tek Kişi Getirme (GET by ID)
 router.get('/:contactId', isValidId, ctrlWrapper(getContactByIdController));
 
-// Kişi Oluşturma (POST)
 router.post(
   '/',
+  upload.single('photo'),
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
 
-// Kişi Güncelleme (PATCH)
 router.patch(
   '/:contactId',
   isValidId,
+  upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(patchContactController),
 );
 
-// Kişi Silme (DELETE)
 router.delete('/:contactId', isValidId, ctrlWrapper(deleteContactController));
 
 export default router;
